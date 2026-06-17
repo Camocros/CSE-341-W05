@@ -5,10 +5,9 @@
     "description": "API for CSE 341 Final Project Part 1",
     "version": "1.0.0"
   },
-  "host": "localhost:3000",
+  "host": "cse-341-w05.onrender.com",
   "basePath": "/",
   "schemes": [
-    "http",
     "https"
   ],
   "paths": {
