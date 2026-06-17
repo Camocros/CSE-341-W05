@@ -2,6 +2,8 @@ const mongodb = require('../database/connect');
 const { ObjectId } = require('mongodb');
 
 const getAll = async (req, res) => {
+  // #swagger.tags = ['Projects']
+  // #swagger.summary = 'Get all projects'
   try {
     const result = await mongodb.getDb().db().collection('projects').find();
     result.toArray().then((lists) => {
@@ -14,6 +16,8 @@ const getAll = async (req, res) => {
 };
 
 const getSingle = async (req, res) => {
+  // #swagger.tags = ['Projects']
+  // #swagger.summary = 'Get a single project'
   try {
     if (!ObjectId.isValid(req.params.id)) {
       res.status(400).json('Must use a valid project id to find a project.');
@@ -35,6 +39,10 @@ const getSingle = async (req, res) => {
 };
 
 const createProject = async (req, res) => {
+  // #swagger.tags = ['Projects']
+  // #swagger.summary = 'Create a new project'
+  // #swagger.description = 'Requires authentication'
+  // #swagger.security = [{ "GitHubOAuth": ["user:email"] }]
   try {
     const project = {
       title: req.body.title,
@@ -58,6 +66,10 @@ const createProject = async (req, res) => {
 };
 
 const updateProject = async (req, res) => {
+  // #swagger.tags = ['Projects']
+  // #swagger.summary = 'Update an existing project'
+  // #swagger.description = 'Requires authentication'
+  // #swagger.security = [{ "GitHubOAuth": ["user:email"] }]
   try {
     if (!ObjectId.isValid(req.params.id)) {
       res.status(400).json('Must use a valid project id to update a project.');
@@ -75,8 +87,8 @@ const updateProject = async (req, res) => {
       .db()
       .collection('projects')
       .replaceOne({ _id: projectId }, project);
-    if (response.modifiedCount > 0) {
-      res.status(204).send();
+    if (response.matchedCount > 0) {
+      res.status(200).json({ message: 'Project updated successfully' });
     } else {
       res.status(404).json('Project not found');
     }
@@ -86,6 +98,8 @@ const updateProject = async (req, res) => {
 };
 
 const deleteProject = async (req, res) => {
+  // #swagger.tags = ['Projects']
+  // #swagger.summary = 'Delete a project'
   try {
     if (!ObjectId.isValid(req.params.id)) {
       res.status(400).json('Must use a valid project id to delete a project.');

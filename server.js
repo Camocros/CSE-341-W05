@@ -3,6 +3,10 @@ const bodyParser = require('body-parser');
 const mongodb = require('./database/connect');
 const swaggerUi = require('swagger-ui-express');
 const swaggerDocument = require('./swagger.json');
+const session = require('express-session');
+const passport = require('passport');
+const GitHubStrategy = require('passport-github2').Strategy;
+
 const port = process.env.PORT || 3000;
 const app = express();
 
@@ -27,17 +31,46 @@ app
     res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
     next();
   })
+  .use(session({
+    secret: process.env.SESSION_SECRET || 'super-portfolio-secret-12345',
+    resave: false,
+    saveUninitialized: true
+  }))
+  .use(passport.initialize())
+  .use(passport.session())
   .use('/', require('./routes'));
+
+passport.use(new GitHubStrategy({
+    clientID: process.env.GITHUB_CLIENT_ID || 'dummy_github_client_id',
+    clientSecret: process.env.GITHUB_CLIENT_SECRET || 'dummy_github_client_secret',
+    callbackURL: process.env.GITHUB_CALLBACK_URL || 'https://cse-341-w05.onrender.com/github-callback'
+  },
+  function(accessToken, refreshToken, profile, done) {
+    return done(null, profile);
+  }
+));
+
+passport.serializeUser((user, done) => {
+  done(null, user);
+});
+
+passport.deserializeUser((user, done) => {
+  done(null, user);
+});
 
 process.on('uncaughtException', (err, origin) => {
   console.log(process.stderr.fd, `Caught exception: ${err}\n` + `Exception origin: ${origin}`);
 });
 
-mongodb.initDb((err, mongodb) => {
-  if (err) {
-    console.log(err);
-  } else {
-    app.listen(port);
-    console.log(`Connected to DB and listening on ${port}`);
-  }
-});
+if (process.env.NODE_ENV !== 'test') {
+  mongodb.initDb((err, mongodb) => {
+    if (err) {
+      console.log(err);
+    } else {
+      app.listen(port);
+      console.log(`Connected to DB and listening on ${port}`);
+    }
+  });
+}
+
+module.exports = app;

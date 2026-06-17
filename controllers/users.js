@@ -2,6 +2,8 @@ const mongodb = require('../database/connect');
 const { ObjectId } = require('mongodb');
 
 const getAll = async (req, res) => {
+  // #swagger.tags = ['Users']
+  // #swagger.summary = 'Get all users'
   try {
     const result = await mongodb.getDb().db().collection('users').find();
     result.toArray().then((lists) => {
@@ -14,6 +16,8 @@ const getAll = async (req, res) => {
 };
 
 const getSingle = async (req, res) => {
+  // #swagger.tags = ['Users']
+  // #swagger.summary = 'Get a single user'
   try {
     if (!ObjectId.isValid(req.params.id)) {
       res.status(400).json('Must use a valid user id to find a user.');
@@ -35,6 +39,8 @@ const getSingle = async (req, res) => {
 };
 
 const createUser = async (req, res) => {
+  // #swagger.tags = ['Users']
+  // #swagger.summary = 'Create a new user'
   try {
     const user = {
       username: req.body.username,
@@ -58,6 +64,8 @@ const createUser = async (req, res) => {
 };
 
 const updateUser = async (req, res) => {
+  // #swagger.tags = ['Users']
+  // #swagger.summary = 'Update an existing user'
   try {
     if (!ObjectId.isValid(req.params.id)) {
       res.status(400).json('Must use a valid user id to update a user.');
@@ -75,8 +83,8 @@ const updateUser = async (req, res) => {
       .db()
       .collection('users')
       .replaceOne({ _id: userId }, user);
-    if (response.modifiedCount > 0) {
-      res.status(204).send();
+    if (response.matchedCount > 0) {
+      res.status(200).json({ message: 'User updated successfully' });
     } else {
       res.status(404).json('User not found');
     }
@@ -86,6 +94,8 @@ const updateUser = async (req, res) => {
 };
 
 const deleteUser = async (req, res) => {
+  // #swagger.tags = ['Users']
+  // #swagger.summary = 'Delete a user'
   try {
     if (!ObjectId.isValid(req.params.id)) {
       res.status(400).json('Must use a valid user id to delete a user.');
